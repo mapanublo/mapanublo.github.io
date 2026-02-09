@@ -26,6 +26,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: pointer;
         }
 
         img {
@@ -36,6 +37,16 @@
             object-fit: contain;
             position: relative;
             z-index: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: none;
         }
 
         .light-beam {
@@ -52,23 +63,34 @@
             filter: blur(30px);
             mix-blend-mode: screen;
             z-index: 2;
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <img src="mapanublo.jpg" alt="MapaNublo Films" id="mainImage">
         <div class="light-beam" id="lightBeam1"></div>
         <div class="light-beam" id="lightBeam2"></div>
         <div class="light-beam" id="lightBeam3"></div>
+        <video id="video" loop playsinline>
+            <source src="mantible.mp4" type="video/mp4">
+            Tu navegador no soporta la reproducción de video.
+        </video>
     </div>
 
     <script>
         const image = document.getElementById('mainImage');
+        const video = document.getElementById('video');
+        const container = document.getElementById('container');
+        const lightBeam1 = document.getElementById('lightBeam1');
+        const lightBeam2 = document.getElementById('lightBeam2');
+        const lightBeam3 = document.getElementById('lightBeam3');
+
         const beams = [
             {
-                element: document.getElementById('lightBeam1'),
+                element: lightBeam1,
                 angle: 0,
                 speed: 0.008,
                 radiusX: 400,
@@ -76,7 +98,7 @@
                 offsetAngle: 0
             },
             {
-                element: document.getElementById('lightBeam2'),
+                element: lightBeam2,
                 angle: Math.PI * 2 / 3,
                 speed: 0.012,
                 radiusX: 350,
@@ -84,7 +106,7 @@
                 offsetAngle: Math.PI * 2 / 3
             },
             {
-                element: document.getElementById('lightBeam3'),
+                element: lightBeam3,
                 angle: Math.PI * 4 / 3,
                 speed: 0.006,
                 radiusX: 380,
@@ -94,9 +116,9 @@
         ];
 
         let time = 0;
+        let animationId = null;
 
         function animateLightBeams() {
-            // Obtener el centro de la imagen
             const rect = image.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
@@ -104,24 +126,19 @@
             time += 0.01;
 
             beams.forEach((beam, index) => {
-                // Movimiento elíptico con variación aleatoria suave
                 const noiseX = Math.sin(time * 0.5 + index * 2) * 50;
                 const noiseY = Math.cos(time * 0.7 + index * 3) * 50;
 
-                // Calcular posición con movimiento elíptico y ruido
                 const x = centerX + Math.cos(beam.angle) * beam.radiusX + noiseX - 300;
                 const y = centerY + Math.sin(beam.angle) * beam.radiusY + noiseY - 300;
 
-                // Aplicar la posición
                 beam.element.style.left = x + 'px';
                 beam.element.style.top = y + 'px';
 
-                // Incrementar el ángulo con velocidad única
                 beam.angle += beam.speed;
             });
 
-            // Continuar la animación
-            requestAnimationFrame(animateLightBeams);
+            animationId = requestAnimationFrame(animateLightBeams);
         }
 
         // Iniciar la animación cuando la imagen esté cargada
@@ -134,10 +151,33 @@
             animateLightBeams();
         }
 
-        // Recalcular en caso de redimensionar la ventana
-        window.addEventListener('resize', () => {
-            // La animación se ajustará automáticamente en el siguiente frame
-        });
+        // Al hacer clic, cambiar a video
+        container.addEventListener('click', () => {
+            // Detener la animación de las luces
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+
+            // Ocultar imagen y luces con transición
+            image.style.opacity = '0';
+            lightBeam1.style.opacity = '0';
+            lightBeam2.style.opacity = '0';
+            lightBeam3.style.opacity = '0';
+
+            // Después de la transición, mostrar el video
+            setTimeout(() => {
+                image.style.display = 'none';
+                lightBeam1.style.display = 'none';
+                lightBeam2.style.display = 'none';
+                lightBeam3.style.display = 'none';
+                video.style.display = 'block';
+                container.style.cursor = 'default';
+
+                // Reproducir el video con sonido
+                video.muted = false;
+                video.play();
+            }, 500);
+        }, { once: true });
     </script>
 </body>
 

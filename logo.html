@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapanublo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .light-beam {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                    rgba(255, 255, 255, 0.3) 0%,
+                    rgba(255, 255, 255, 0.15) 20%,
+                    rgba(255, 255, 255, 0.05) 40%,
+                    transparent 70%);
+            pointer-events: none;
+            filter: blur(30px);
+            mix-blend-mode: screen;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img src="mapanublo.jpg" alt="MapaNublo Films" id="mainImage">
+        <div class="light-beam" id="lightBeam1"></div>
+        <div class="light-beam" id="lightBeam2"></div>
+        <div class="light-beam" id="lightBeam3"></div>
+    </div>
+
+    <script>
+        const image = document.getElementById('mainImage');
+        const beams = [
+            {
+                element: document.getElementById('lightBeam1'),
+                angle: 0,
+                speed: 0.008,
+                radiusX: 400,
+                radiusY: 300,
+                offsetAngle: 0
+            },
+            {
+                element: document.getElementById('lightBeam2'),
+                angle: Math.PI * 2 / 3,
+                speed: 0.012,
+                radiusX: 350,
+                radiusY: 400,
+                offsetAngle: Math.PI * 2 / 3
+            },
+            {
+                element: document.getElementById('lightBeam3'),
+                angle: Math.PI * 4 / 3,
+                speed: 0.006,
+                radiusX: 380,
+                radiusY: 350,
+                offsetAngle: Math.PI * 4 / 3
+            }
+        ];
+
+        let time = 0;
+
+        function animateLightBeams() {
+            // Obtener el centro de la imagen
+            const rect = image.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            time += 0.01;
+
+            beams.forEach((beam, index) => {
+                // Movimiento elíptico con variación aleatoria suave
+                const noiseX = Math.sin(time * 0.5 + index * 2) * 50;
+                const noiseY = Math.cos(time * 0.7 + index * 3) * 50;
+
+                // Calcular posición con movimiento elíptico y ruido
+                const x = centerX + Math.cos(beam.angle) * beam.radiusX + noiseX - 300;
+                const y = centerY + Math.sin(beam.angle) * beam.radiusY + noiseY - 300;
+
+                // Aplicar la posición
+                beam.element.style.left = x + 'px';
+                beam.element.style.top = y + 'px';
+
+                // Incrementar el ángulo con velocidad única
+                beam.angle += beam.speed;
+            });
+
+            // Continuar la animación
+            requestAnimationFrame(animateLightBeams);
+        }
+
+        // Iniciar la animación cuando la imagen esté cargada
+        image.addEventListener('load', () => {
+            animateLightBeams();
+        });
+
+        // Si la imagen ya está cargada (caché)
+        if (image.complete) {
+            animateLightBeams();
+        }
+
+        // Recalcular en caso de redimensionar la ventana
+        window.addEventListener('resize', () => {
+            // La animación se ajustará automáticamente en el siguiente frame
+        });
+    </script>
+</body>
+
+</html>
