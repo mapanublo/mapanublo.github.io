@@ -66,6 +66,19 @@
             z-index: 2;
             transition: opacity 0.5s ease;
         }
+
+        /* Optimización para dispositivos móviles */
+        @media (max-width: 768px) {
+            .container {
+                cursor: default;
+            }
+
+            .light-beam {
+                width: 250px;
+                height: 250px;
+                filter: blur(20px);
+            }
+        }
     </style>
 </head>
 
@@ -89,29 +102,33 @@
         const lightBeam2 = document.getElementById('lightBeam2');
         const lightBeam3 = document.getElementById('lightBeam3');
 
+        // Detectar si es dispositivo móvil
+        const isMobile = window.innerWidth <= 768;
+        const radiusMultiplier = isMobile ? 0.35 : 1;
+
         const beams = [
             {
                 element: lightBeam1,
                 angle: 0,
                 speed: 0.008,
-                radiusX: 400,
-                radiusY: 300,
+                radiusX: 400 * radiusMultiplier,
+                radiusY: 300 * radiusMultiplier,
                 offsetAngle: 0
             },
             {
                 element: lightBeam2,
                 angle: Math.PI * 2 / 3,
                 speed: 0.012,
-                radiusX: 350,
-                radiusY: 400,
+                radiusX: 350 * radiusMultiplier,
+                radiusY: 400 * radiusMultiplier,
                 offsetAngle: Math.PI * 2 / 3
             },
             {
                 element: lightBeam3,
                 angle: Math.PI * 4 / 3,
                 speed: 0.006,
-                radiusX: 380,
-                radiusY: 350,
+                radiusX: 380 * radiusMultiplier,
+                radiusY: 350 * radiusMultiplier,
                 offsetAngle: Math.PI * 4 / 3
             }
         ];
@@ -124,14 +141,17 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
+            // Offset ajustado según el tamaño de las luces
+            const offset = isMobile ? 125 : 300;
+
             time += 0.01;
 
             beams.forEach((beam, index) => {
                 const noiseX = Math.sin(time * 0.5 + index * 2) * 50;
                 const noiseY = Math.cos(time * 0.7 + index * 3) * 50;
 
-                const x = centerX + Math.cos(beam.angle) * beam.radiusX + noiseX - 300;
-                const y = centerY + Math.sin(beam.angle) * beam.radiusY + noiseY - 300;
+                const x = centerX + Math.cos(beam.angle) * beam.radiusX + noiseX - offset;
+                const y = centerY + Math.sin(beam.angle) * beam.radiusY + noiseY - offset;
 
                 beam.element.style.left = x + 'px';
                 beam.element.style.top = y + 'px';
