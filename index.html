@@ -89,8 +89,8 @@
         <div class="light-beam" id="lightBeam1"></div>
         <div class="light-beam" id="lightBeam2"></div>
         <div class="light-beam" id="lightBeam3"></div>
-        <video id="video" loop playsinline>
-            <source src="mantible.mp4" type="video/mp4">
+        <video id="video" playsinline>
+            <source src="trailer.mp4" type="video/mp4">
             Tu navegador no soporta la reproducción de video.
         </video>
     </div>
@@ -228,6 +228,15 @@
                 } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
                 }
+            }
+        });
+
+        // Al finalizar el trailer, reproducir la película
+        video.addEventListener('ended', () => {
+            if (video.currentSrc.includes('trailer.mp4')) {
+                video.src = 'pelicula.mp4';
+                video.load();
+                video.play();
             }
         });
     </script>
